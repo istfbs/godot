@@ -1057,14 +1057,15 @@ void ParticleProcessMaterial::_update_shader() {
 
 	code += "	process_display_param(params, lifetime_percent);\n\n";
 
-	code += "	float base_angle = dynamic_params.angle;\n";
+	code += "	float base_angle = CUSTOM.x / degree_to_rad;\n";
 	if (tex_parameters[PARAM_ANGLE].is_valid()) {
 		code += "	base_angle *= texture(angle_texture, vec2(lifetime_percent)).r;\n";
 	}
 	if (tex_parameters[PARAM_ANGULAR_VELOCITY].is_valid()) {
-		code += "	base_angle += CUSTOM.y * LIFETIME * dynamic_params.angular_velocity * texture(angular_velocity_texture, vec2(lifetime_percent)).r;\n";
+		code += "	float angular_velocity = dynamic_params.angular_velocity * texture(angular_velocity_texture, vec2(lifetime_percent)).r;\n";
+		code += "	base_angle += angular_velocity * DELTA / 1.5;\n";
 	} else {
-		code += "	base_angle += CUSTOM.y * LIFETIME * dynamic_params.angular_velocity;\n";
+		code += "	base_angle += dynamic_params.angular_velocity * DELTA / 1.5;\n";
 	}
 	code += "	CUSTOM.x = base_angle * degree_to_rad;\n";
 	code += "	COLOR = params.color;\n\n";
